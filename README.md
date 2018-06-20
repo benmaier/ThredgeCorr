@@ -27,7 +27,9 @@ import numpy as np
 from ThredgeCorr import ThredgeCorrGraph
 ```
 
-Create an instance of the generating class.
+### First steps
+
+Create an instance of the generating class and then an edgelist.
 
 ```python
 N_nodes = 100
@@ -37,21 +39,25 @@ mean_degree = 1.2
 G = ThredgeCorrGraph(N_nodes, beta, mean_degree)
 
 # Alternatively, set this up with a threshold
-G = ThredgeCorrGraph(N_nodes, beta, threshold = 2.5)
+G = ThredgeCorrGraph(N_nodes, beta, threshold = 2.253)
 
 # get an edge list from this generating class
 edges = G.get_new_edge_list()
 ```
 
+### Fixing threshold (mean degree, respectively)
+
 Change the threshold directly, or indirectly using the desired mean degree
 
 ```python
-G.set_threshold(2.3)
+G.set_threshold(2.253)
 
 # or
 
-G.set_mean_degree(5.0)
+G.set_mean_degree(1.2)
 ```
+
+### Covariance update
 
 Update the covariance (takes a while since the Cholesky decomposition has to be run again).
 
@@ -59,12 +65,34 @@ Update the covariance (takes a while since the Cholesky decomposition has to be 
 G.update_covariance(0.2)
 ```
 
+### Degrees from network realizations
+
 Compute degree sequences of 500 instances of the current configuration.
 
 ```python
 ks = [ G.get_new_adjacency_matrix().sum(axis=1).flatten() for n in range(500) ]
 ```
 
+### Degrees from single node sampling
+
+Compute degree sequence comparable to 500 instances of `N = 100` nodes.
+
+```python
+N = 100
+ks = G.estimate_degree_sequence(N*500)
+```
+
+### Transitivity estimation from sampling 3 nodes
+
+Estimate the transitivity by sampling a network of 3 nodes `n` times, then calculating `T = 3 * n_triangles / (3 * n_triangles + n_chains`.
+
+```python
+from scipy.special import binom
+N = 100
+ks = G.estimate_transitivity(int(binom(N,3))*500)
+```
+
+### Class attributes
 You can also check out the values of the current matrices and parameters
 
 ```python
@@ -76,6 +104,8 @@ G.X # vector of multivariate Gaussian random variables
 G.mean_degree() # mean degree as given by the threshold
 ```
 
+### Edge index ↔ node pair indices
+
 If you want to compute the edge index `e` of a node pair `(i, j)` (with condition `i < j`),
 or the node index pair `(i, j)` from an edge index `e`, do
 
@@ -83,5 +113,7 @@ or the node index pair `(i, j)` from an edge index `e`, do
 e = G.edge_index(i, j)
 i, j = G.node_indices(e)
 ```
+
+
 
 

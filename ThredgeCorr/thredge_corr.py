@@ -2,6 +2,7 @@ from __future__ import print_function
 import numpy as np
 import scipy as sp
 import scipy.sparse as sprs
+from scipy.special import binom
 
 from scipy.optimize import newton
 
@@ -106,6 +107,7 @@ class ThredgeCorrGraph:
         self.C = C
         self.L = np.linalg.cholesky(C)
 
+
     def generate_weight_vector(self):
         #self.X = self.L.dot( np.random.normal(0,1,self.m) )
         self.X = self.L.dot( np.random.randn(self.m) )
@@ -144,8 +146,30 @@ class ThredgeCorrGraph:
             A += A.T
             return A
 
+    def estimate_transitivity(self,N_measurements):
 
+        self.C_triangle = np.ones((3,3)) * self.b
+        np.fill_diagonal(self.C_triangle, 1)
+        self.L_triangle = np.linalg.cholesky(self.C_triangle)
 
+        X = self.L_triangle.dot(np.random.randn(3,N_measurements))
+
+        n_edges = np.array(X>=self.t,dtype=int).sum(axis=0)
+        n_triangles = np.count_nonzero(n_edges==3)
+        n_chains = np.count_nonzero(n_edges==2)
+
+        return 3.0 * float(n_triangles) / (3 * float(n_triangles) + float(n_chains))
+
+    def estimate_degree_sequence(self,N_measurements):
+        
+        self.C_one_node = np.ones((self.N,self.N)) * self.b
+        np.fill_diagonal(self.C_one_node, 1)
+        self.L_one_node = np.linalg.cholesky(self.C_one_node)
+        
+        X = self.L_one_node.dot(np.random.randn(self.N,N_measurements))
+        k = np.array(X>=self.t,dtype=int).sum(axis=0)
+
+        return k
 
 class NumpyThredgeCorrGraph(ThredgeCorrGraph):
 
@@ -178,12 +202,12 @@ def get_degrees_from_edge_list(N,edges):
 if __name__ == "__main__":
 
     
-    N = 100 
+    N = 50 
 
     from time import time
 
     start = time()
-    A = ThredgeCorrGraph(N,0.4,.5)
+    A = ThredgeCorrGraph(N,0.2,.5)
     #T = NumpyThredgeCorrGraph(N,0.49,.5)
     end = time()
 
@@ -206,32 +230,32 @@ if __name__ == "__main__":
 
     #np_edges = T.get_n_edge_lists(500)
     
-    for meas in range(500):
+    for meas in range(50):
         edges = A.get_new_edge_list()
-        ks = get_degrees_from_edge_list(N,edges)
-        k1.extend( ks.tolist())
-        """
+        ks = get_degrees_from_edge_list(N,edges).tolist()
+        #k1.extend( ks.tolist())
         G = nx.Graph()
         G.add_nodes_from(range(N))
         G.add_edges_from(edges)
 
         ks = [ d[1] for d in list(G.degree())]
-        C1.append(nx.average_clustering(G))
+        C1.append(nx.transitivity(G))
         k1.extend(ks)
 
-        """
 
         #edges = np_edges[meas]
         #k2.extend(ks)
 
     #print(np.array(k).mean())
-    #print(np.array(C).mean())
+    print("Transitivity from networks =", np.array(C1).mean())
+    print("Transitivity from 3-cliques =", A.estimate_transitivity(int(binom(N,3))*50))
 
     from rocsNWL.drawing import draw
 
     pl.figure()
     pl.hist(k1,histtype='step',bins=max(k1))
-    #pl.hist(k2,histtype='step',bins=max(k2))
+    k2 = A.estimate_degree_sequence(N*50)
+    pl.hist(k2,histtype='step',bins=max(k2))
     pl.xscale('log')
     pl.yscale('log')
     print(np.mean(k1))
