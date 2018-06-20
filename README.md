@@ -76,7 +76,7 @@ G.X # vector of multivariate Gaussian random variables
 ```
 
 If you want to compute the edge index `e` of a node pair `(i, j)` (with condition `i < j`),
-or the node index pair `(i, j)` from an edge index i, do
+or the node index pair `(i, j)` from an edge index `e`, do
 
 ```python
 e = G.edge_index(i, j)
