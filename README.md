@@ -73,6 +73,7 @@ G.b # edge covariance
 G.C # Covariance matrix
 G.L # Cholesky decomposition
 G.X # vector of multivariate Gaussian random variables
+G.mean_degree() # mean degree as given by the threshold
 ```
 
 If you want to compute the edge index `e` of a node pair `(i, j)` (with condition `i < j`),

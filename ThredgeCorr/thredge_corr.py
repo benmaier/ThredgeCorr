@@ -35,6 +35,9 @@ class ThredgeCorrGraph:
         p = mean_degree / (self.N-1.0)
         self.t = sp.optimize.newton(lambda x: ccdf(x) - p, 0)
 
+    def mean_degree(self):
+        p = ccdf(self.t)
+        return p * (self.N-1)
 
     def edge_index(self,i,j):
         return int(i*self.N + j - (i+2)*(i+1) * 0.5)
