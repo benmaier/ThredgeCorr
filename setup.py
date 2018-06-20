@@ -10,6 +10,6 @@ setup(name='ThredgeCorr',
       packages=['ThredgeCorr'],
       install_requires=[
           'numpy>=1.14',
-          'scipy>=0.19',
+          'scipy>=0.17',
       ],
       zip_safe=False)

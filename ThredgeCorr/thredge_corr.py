@@ -208,7 +208,7 @@ if __name__ == "__main__":
     
     N = 100 
 
-    N_meas = 500
+    N_meas = 1
 
     from time import time
 
@@ -219,12 +219,12 @@ if __name__ == "__main__":
 
     print("std method; N =", N, '; generating ', N_meas, 'networks took', end-start, 'seconds')
 
-    start = time()
-    numpymethod = NumpyThredgeCorrGraph(N,0.49,.5)
-    numpymethod.get_n_edge_lists(N_meas)
-    end = time()
+    #start = time()
+    #numpymethod = NumpyThredgeCorrGraph(N,0.49,.5)
+    #numpymethod.get_n_edge_lists(N_meas)
+    #end = time()
 
-    print("numpy method; N =", N, '; generating ', N_meas, 'networks took', end-start, 'seconds')
+    #print("numpy method; N =", N, '; generating ', N_meas, 'networks took', end-start, 'seconds')
 
 
     import networkx as nx
@@ -271,13 +271,13 @@ if __name__ == "__main__":
     #pl.hist(C1,histtype='step')
     #pl.hist(C2,histtype='step')
 
-    pl.figure()
+    #pl.figure()
 
-    G = nx.Graph()
-    G.add_nodes_from(range(N))
-    G.add_edges_from(edges)
-    #draw(G,labels=list(range(N)))
-    draw(G)
+    #G = nx.Graph()
+    #G.add_nodes_from(range(N))
+    #G.add_edges_from(edges)
+    ##draw(G,labels=list(range(N)))
+    #draw(G)
 
     fig,ax = pl.subplots(1,2,figsize=(10,5))
     ax[0].set_title("the covariance matrix $C$")
