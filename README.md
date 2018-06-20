@@ -84,7 +84,7 @@ ks = G.estimate_degree_sequence(N*500)
 
 ### Transitivity estimation from sampling 3 nodes
 
-Estimate the transitivity by sampling a network of 3 nodes `n` times, then calculating `T = 3 * n_triangles / (3 * n_triangles + n_chains`.
+Estimate the transitivity by sampling a network of 3 nodes `n` times, then calculating `T = 3 * n_triangles / (3 * n_triangles + n_chains)`.
 
 ```python
 from scipy.special import binom
