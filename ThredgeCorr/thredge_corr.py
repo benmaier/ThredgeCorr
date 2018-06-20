@@ -13,7 +13,7 @@ def ccdf(x):
 
 class ThredgeCorrGraph:
 
-    def __init__(self,N,covariance,mean_degree=None,threshold=None):
+    def __init__(self,N,covariance,mean_degree=None,threshold=None,build_cholesky_matrix=True):
 
 
         if (mean_degree is None) and (threshold is not None):
@@ -25,7 +25,7 @@ class ThredgeCorrGraph:
         self.N = N
         self.m = int(N*(N-1)/2)
 
-        self.update_covariance(covariance)
+        self.update_covariance(covariance,build_cholesky_matrix)
 
         self.X = None
 
@@ -83,7 +83,7 @@ class ThredgeCorrGraph:
         self.C = C
         self.L = np.linalg.cholesky(C)
 
-    def update_covariance(self,covariance):
+    def update_covariance(self,covariance,build_cholesky=True):
         """Create the covariance matrix and the cholesky matrix subsequently"""
 
         self.b = b = covariance
@@ -105,7 +105,8 @@ class ThredgeCorrGraph:
                     C[edge3, edge2] = b
                     
         self.C = C
-        self.L = np.linalg.cholesky(C)
+        if build_cholesky:
+            self.L = np.linalg.cholesky(C)
 
 
     def generate_weight_vector(self):
@@ -173,17 +174,21 @@ class ThredgeCorrGraph:
 
 class NumpyThredgeCorrGraph(ThredgeCorrGraph):
 
+    def __init__(self,N,covariance,mean_degree=None,threshold=None):
+
+        ThredgeCorrGraph.__init__(self,N,covariance,
+                                  mean_degree = mean_degree,
+                                  threshold = threshold,
+                                  build_cholesky_matrix = False)
+
     def get_n_edge_lists(self,n):
 
         X = multivariate_normal(np.zeros(self.C.shape[:1]),self.C,size=n)
 
         edges = []
         for meas in range(n):
-            these_edges = []
             ndx = np.where(X[meas,:]>self.t)[0]
-            these_dges = []
-            for e in ndx:
-                these_edges.append( self.node_indices(e) )
+            these_edges = [ self.node_indices(e) for e in ndx ]
             edges.append(these_edges)
 
         return edges
@@ -200,24 +205,26 @@ def get_degrees_from_edge_list(N,edges):
         
 
 if __name__ == "__main__":
-
     
-    N = 50 
+    N = 100 
+
+    N_meas = 500
 
     from time import time
 
     start = time()
-    A = ThredgeCorrGraph(N,0.2,.5)
-    #T = NumpyThredgeCorrGraph(N,0.49,.5)
+    A = ThredgeCorrGraph(N,0.49,.5)
+    [ A.get_new_edge_list() for n in range(N_meas) ]
     end = time()
 
-    print("fast method; N =", N, '; took', end-start, 'seconds')
+    print("std method; N =", N, '; generating ', N_meas, 'networks took', end-start, 'seconds')
 
-    #start = time()
-    #A.update_covariance_slow(0.1)
-    #end = time()
+    start = time()
+    numpymethod = NumpyThredgeCorrGraph(N,0.49,.5)
+    numpymethod.get_n_edge_lists(N_meas)
+    end = time()
 
-    #print("slow method; N =", N, '; took', end-start, 'seconds')
+    print("numpy method; N =", N, '; generating ', N_meas, 'networks took', end-start, 'seconds')
 
 
     import networkx as nx
@@ -273,8 +280,11 @@ if __name__ == "__main__":
     draw(G)
 
     fig,ax = pl.subplots(1,2,figsize=(10,5))
-    ax[0].set_title("bruteforce")
-    ax[0].spy(A.C)
+    ax[0].set_title("the covariance matrix $C$")
+    ax[0].imshow(A.C)
+    ax[1].set_title("the covariance matrix $C^2$")
+    C_squared = A.C.dot(A.C)
+    ax[1].imshow(C_squared)
 
     #ax[1].set_title("sophisticated")
     #ax[1].spy(A.C2)
