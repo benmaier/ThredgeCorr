@@ -89,7 +89,7 @@ Estimate the transitivity by sampling a network of 3 nodes `n` times, then calcu
 ```python
 from scipy.special import binom
 N = 100
-ks = G.estimate_transitivity(int(binom(N,3))*500)
+T = G.estimate_transitivity(int(binom(N,3))*500)
 ```
 
 ### Class attributes
