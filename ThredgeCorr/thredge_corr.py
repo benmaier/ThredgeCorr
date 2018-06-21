@@ -147,30 +147,59 @@ class ThredgeCorrGraph:
             A += A.T
             return A
 
-    def estimate_transitivity(self,N_measurements):
+    def estimate_transitivity(self,N_measurements,chunksize=None):
+
+        if chunksize is None:
+            chunksize = N_measurements
 
         self.C_triangle = np.ones((3,3)) * self.b
         np.fill_diagonal(self.C_triangle, 1)
         self.L_triangle = np.linalg.cholesky(self.C_triangle)
 
-        X = self.L_triangle.dot(np.random.randn(3,N_measurements))
+        n_triangles = 0
+        n_chains = 0
 
-        n_edges = np.array(X>=self.t,dtype=int).sum(axis=0)
-        n_triangles = np.count_nonzero(n_edges==3)
-        n_chains = np.count_nonzero(n_edges==2)
+        n_chunks = int(N_measurements // chunksize)
+
+        for chunk in range(n_chunks+1):
+
+            if chunk == n_chunks:
+                chunksize = int(N_measurements % chunksize)
+                if chunksize == 0:
+                    break
+
+            X = self.L_triangle.dot(np.random.randn(3,chunksize))
+
+            n_edges = np.array(X>=self.t,dtype=int).sum(axis=0)
+            n_triangles += np.count_nonzero(n_edges==3)
+            n_chains += np.count_nonzero(n_edges==2)
 
         return 3.0 * float(n_triangles) / (3 * float(n_triangles) + float(n_chains))
 
-    def estimate_degree_sequence(self,N_measurements):
+    def estimate_degree_sequence(self,N_measurements,chunksize=None):
         
+        if chunksize is None:
+            chunksize = N_measurements
+
         self.C_one_node = np.ones((self.N,self.N)) * self.b
         np.fill_diagonal(self.C_one_node, 1)
         self.L_one_node = np.linalg.cholesky(self.C_one_node)
         
-        X = self.L_one_node.dot(np.random.randn(self.N,N_measurements))
-        k = np.array(X>=self.t,dtype=int).sum(axis=0)
+        n_chunks = int(N_measurements // chunksize)
 
-        return k
+        k = []
+
+        for chunk in range(n_chunks+1):
+
+            if chunk == n_chunks:
+                chunksize = int(N_measurements % chunksize)
+                if chunksize == 0:
+                    break
+
+            X = self.L_one_node.dot(np.random.randn(self.N,chunksize))
+            k.extend( np.array(X>=self.t,dtype=int).sum(axis=0).tolist() )
+
+        return np.array(k)
 
 class NumpyThredgeCorrGraph(ThredgeCorrGraph):
 
