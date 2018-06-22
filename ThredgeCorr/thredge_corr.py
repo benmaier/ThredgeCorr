@@ -5,11 +5,34 @@ import scipy.sparse as sprs
 from scipy.special import binom
 
 from scipy.optimize import newton
+from scipy.optimize import root
 
 from numpy.random import multivariate_normal
 
 def ccdf(x):
     return 1 - 0.5*(1 + sp.special.erf(x/np.sqrt(2)))
+
+def _F(X,n,beta):
+    a,b,c = X
+    ans = np.zeros(3)
+    ans[0] = -1 + a**2 + 2*b**2*(-2 + n) + c**2*(-1 - 2*(-2 + n) + ((-1 + n)*n)/2.)
+    ans[1] = 2*a*b + 2*b*c*(-3 + n) + b**2*(-2 + n) + (c**2*(12 - 7*n + n**2))/2. - beta
+    ans[2] = 4*b**2 + 4*b*c*(-4 + n) + (c*(4*a + c*(20 - 9*n + n**2)))/2.
+    return ans
+
+def _jacobian(X,n,beta):
+    a,b,c = X
+    J = np.zeros((3,3))
+    J[0,0] = 2*a
+    J[0,1] = 4*b*(-2 + n)
+    J[0,2] = 2*c*(-1 - 2*(-2 + n) + ((-1 + n)*n)/2.)
+    J[1,0] = 2*b
+    J[1,1] = 2*a + 2*c*(-3 + n) + 2*b*(-2 + n)
+    J[1,2] = 2*b*(-3 + n) + 2*c*(-2*(-3 + n) - n + ((-1 + n)*n)/2.)
+    J[2,0] = 2*c
+    J[2,1] = 8*b + 4*c*(-4 + n)
+    J[2,2] = 2*a + 4*b*(-4 + n) + 2*c*(-6 - 4*(-4 + n) + ((-1 + n)*n)/2.)
+    return J
 
 class ThredgeCorrGraph:
 
@@ -227,6 +250,38 @@ class ThredgeCorrGraph:
             k.extend( np.array(X>=self.t,dtype=int).sum(axis=0).tolist() )
 
         return np.array(k)
+
+class FastThredgeCorrGraph(ThredgeCorrGraph):
+
+
+    def __init__(self,N,covariance,mean_degree=None,threshold=None):
+
+        ThredgeCorrGraph.__init__(self,N,covariance,
+                                  mean_degree = mean_degree,
+                                  threshold = threshold,
+                                  build_cholesky_matrix = False)
+
+    def update_covariance(self,covariance,build_cholesky_matrix=False):
+
+        self.b = covariance
+        self.parameters = root(_F,[0.7, 0.02, -4e-5],jac=_jacobian,args=(self.N,self.b),tol=1e-16).x
+
+    def generate_weight_vector(self):
+        a,b,c = self.parameters
+        A = np.zeros((self.N,self.N))
+        y = np.random.normal(size=self.m)
+        s = np.sum(y)
+        w = np.zeros(self.N)
+        for i in range(self.N):
+            for j in range(i):
+                w[i] += y[self.edge_index(j,i)]
+            for j in range(i+1,self.N):
+                w[i] += y[self.edge_index(i,j)]
+        self.X = (a-2*b+c)*y + c*s
+        for i in range(self.N):
+            for j in range(i+1,self.N):
+                self.X[self.edge_index(i,j)] += (b-c)*(w[i]+w[j])
+	
 
 class NumpyThredgeCorrGraph(ThredgeCorrGraph):
 

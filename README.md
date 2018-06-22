@@ -45,6 +45,18 @@ G = ThredgeCorrGraph(N_nodes, beta, threshold = 2.253)
 edges = G.get_new_edge_list()
 ```
 
+### Fast generation method
+
+Actually generate the networks faster. Everything else stays the same, but you use
+
+```python
+from ThredgeCorr import FastThredgeCorrGraph
+
+G = FastThredgeCorrGraph(N_nodes, beta, mean_degree)
+# or
+G = FastThredgeCorrGraph(N_nodes, beta, threshold = 2.253)
+```
+
 ### Fixing threshold (mean degree, respectively)
 
 Change the threshold directly, or indirectly using the desired mean degree
