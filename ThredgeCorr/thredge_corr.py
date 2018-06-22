@@ -176,6 +176,33 @@ class ThredgeCorrGraph:
 
         return 3.0 * float(n_triangles) / (3 * float(n_triangles) + float(n_chains))
 
+    def estimate_triangles(self,N_measurements,chunksize=None):
+
+        if chunksize is None:
+            chunksize = N_measurements
+
+        self.C_triangle = np.ones((3,3)) * self.b
+        np.fill_diagonal(self.C_triangle, 1)
+        self.L_triangle = np.linalg.cholesky(self.C_triangle)
+
+        n_triangles = 0
+
+        n_chunks = int(N_measurements // chunksize)
+
+        for chunk in range(n_chunks+1):
+
+            if chunk == n_chunks:
+                chunksize = int(N_measurements % chunksize)
+                if chunksize == 0:
+                    break
+
+            X = self.L_triangle.dot(np.random.randn(3,chunksize))
+
+            n_edges = np.array(X>=self.t,dtype=int).sum(axis=0)
+            n_triangles += np.count_nonzero(n_edges==3)
+
+        return float(n_triangles)
+
     def estimate_degree_sequence(self,N_measurements,chunksize=None):
         
         if chunksize is None:
