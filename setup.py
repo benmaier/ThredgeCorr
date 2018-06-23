@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='ThredgeCorr',
-      version='0.0.1',
+      version='0.0.2',
       description="Generate instances of George Cantwell's Edge-correlated network models",
       url='https://www.github.com/benmaier/ThredgeCorr',
       author='Benjamin F. Maier',
