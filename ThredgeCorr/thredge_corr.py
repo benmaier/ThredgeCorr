@@ -136,7 +136,10 @@ class ThredgeCorrGraph:
         #self.X = self.L.dot( np.random.normal(0,1,self.m) )
         self.X = self.L.dot( np.random.randn(self.m) )
 
-    def threshold_and_get_edgelist(self,threshold):
+    def threshold_and_get_edgelist(self):
+
+        threshold = self.t
+
         if self.X is None:
             self.generate_weight_vector()
 
@@ -150,11 +153,11 @@ class ThredgeCorrGraph:
 
     def get_new_edge_list(self):
         self.X = None
-        return self.threshold_and_get_edgelist(self.t)
+        return self.threshold_and_get_edgelist()
 
     def get_new_adjacency_matrix(self,sparse=False):
         self.X = None
-        edges = self.threshold_and_get_edgelist(self.t)
+        edges = self.threshold_and_get_edgelist()
 
         if sparse:
             rowcol = np.array(edges,dtype=int)
@@ -266,7 +269,7 @@ class FastThredgeCorrGraph(ThredgeCorrGraph):
         self.b = covariance
         self.parameters = root(_F,[0.7, 0.02, -4e-5],jac=_jacobian,args=(self.N,self.b),tol=1e-16).x
 
-    def generate_weight_vector(self):
+    def generate_weight_vector(self,get_thresholded_edge_list=False):
         a,b,c = self.parameters
         A = np.zeros((self.N,self.N))
         y = np.random.normal(size=self.m)
@@ -278,10 +281,33 @@ class FastThredgeCorrGraph(ThredgeCorrGraph):
             for j in range(i+1,self.N):
                 w[i] += y[self.edge_index(i,j)]
         self.X = (a-2*b+c)*y + c*s
-        for i in range(self.N):
+        edges = []
+        for i in range(self.N-1):
             for j in range(i+1,self.N):
-                self.X[self.edge_index(i,j)] += (b-c)*(w[i]+w[j])
+                e = self.edge_index(i,j)
+                self.X[e] += (b-c)*(w[i]+w[j])
+                if self.X[e] >= self.t:
+                    edges.append((i,j))
+
+        if get_thresholded_edge_list:
+            return edges
+
+    def threshold_and_get_edgelist(self):
+
+        threshold = self.t
 	
+        if self.X is None:
+            edges = self.generate_weight_vector(get_thresholded_edge_list=True)
+        else:
+
+            ndx = np.where(self.X>=threshold)[0]
+
+            edges = []
+            for e in ndx:
+                edges.append( self.node_indices(e) )
+
+        return edges
+
 
 class NumpyThredgeCorrGraph(ThredgeCorrGraph):
 
