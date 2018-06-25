@@ -1,8 +1,8 @@
 # ThredgeCorr
 
 Generate instances of George's thresholded edge-correlated network model.
-This currently works only with the Cholesky decomposition and hence is only possible
-to use up to network sizes of ≈ 150 Nodes.
+
+If you want sample from distributions with larger `N`, check out the C++-based Python package https://github.com/benmaier/cThredgeCorr .
 
 ## Install
 
