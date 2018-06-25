@@ -2,7 +2,7 @@
 
 Generate instances of George's thresholded edge-correlated network model.
 
-If you want sample from distributions with larger `N`, check out the C++-based Python package https://github.com/benmaier/cThredgeCorr .
+If you want to sample from distributions with larger `N`, check out the C++-based Python package https://github.com/benmaier/cThredgeCorr .
 
 ## Install
 
