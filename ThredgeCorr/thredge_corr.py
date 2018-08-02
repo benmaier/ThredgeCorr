@@ -346,6 +346,28 @@ class NumpyThredgeCorrGraph(ThredgeCorrGraph):
 
         return edges
 
+class SuperFastThredgeCorrGraph(ThredgeCorrGraph):
+
+
+    def __init__(self,N,covariance,mean_degree=None,threshold=None):
+
+        ThredgeCorrGraph.__init__(self,N,covariance,
+                                  mean_degree = mean_degree,
+                                  threshold = threshold,
+                                  build_cholesky_matrix = False)
+
+    def threshold_and_get_edgelist(self):
+
+        f1 = np.sqrt(self.b)
+        f2 = np.sqrt(1-2*self.b)
+
+        Z = np.random.randn(self.N)
+        edges = [ (i, j)\
+                  for i in range(self.N-1)\
+                  for j in range(i+1,self.N)\
+                  if np.random.rand() > (self.t - f1*(Z[i]+Z[j])) / f2 ]
+
+        return edges
 
 def get_degrees_from_edge_list(N,edges):
     rowcol = np.array(edges,dtype=int)
