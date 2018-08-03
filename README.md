@@ -45,6 +45,20 @@ G = ThredgeCorrGraph(N_nodes, beta, threshold = 2.253)
 edges = G.get_new_edge_list()
 ```
 
+### Super fast generation method
+
+Actually generate the networks faster. Everything else stays the same, but you use
+
+```python
+from ThredgeCorr import SuperFastThredgeCorrGraph
+
+G = SuperFastThredgeCorrGraph(N_nodes, beta, mean_degree)
+# or
+G = SuperFastThredgeCorrGraph(N_nodes, beta, threshold = 2.253)
+```
+
+If you need it even faster, consider using https://github.com/benmaier/cThredgeCorr.
+
 ### Fast generation method
 
 Actually generate the networks faster. Everything else stays the same, but you use
