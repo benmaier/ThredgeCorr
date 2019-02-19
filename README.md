@@ -13,7 +13,7 @@ Use pip:
 
 ### First steps
 
-Create an instance of the generating class and then an edgelist.
+Create an instance of the network model.
 
 ```python
 from ThredgeCorr import get_networkx_graph
@@ -26,6 +26,17 @@ G = get_networkx_graph(N_nodes, covariance, mean_degree=mean_degree)
 # Alternatively, set this up with a threshold
 G = get_networkx_graph(N_nodes, covariance, threshold=0.5)
 ```
+
+### Theory
+
+To calculate network properties as explained in the paper, check out the modules
+
+```python
+ThredgeCorr.basic_patterns
+ThredgeCorr.degree_dist
+```
+
+and the scripts in https://github.com/benmaier/ThredgeCorr/tree/master/paper_figures .
 
 ### Use the more advanced class
 
