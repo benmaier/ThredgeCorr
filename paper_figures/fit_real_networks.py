@@ -10,10 +10,12 @@ import sys
 fig = pl.figure(1,figsize=(8,2.5))
 
 ### high school network
+print("loading",'degree_sequences/comm50.degree_sequence','...')
 k = np.loadtxt('degree_sequences/comm50.degree_sequence')
 k = np.array(k,dtype=int)
 kmax = np.max(k)+1
 n = len(k)
+print("fitting...")
 t = solve_t( np.mean(k) ,n )
 rho = solve_rho( np.mean(k), np.mean(k**2), n )
 
@@ -33,10 +35,12 @@ ax.set_xlabel('node degree $k$')
 #pl.show()
 #sys.exit(0)
 ### collab network
+print("loading", 'degree_sequences/cond-mat.degree_sequence','...')
 k = np.loadtxt('degree_sequences/cond-mat.degree_sequence')
 k = np.array(k,dtype=int)
 kmax = np.max(k)+1
 n = len(k)
+print("fitting...")
 t = solve_t( np.mean(k) ,n )
 rho = solve_rho( np.mean(k), np.mean(k**2), n )
 
@@ -61,11 +65,13 @@ bp.strip_axis(ax)
 
 
 ### proteins
+print("loading",'degree_sequences/out.reactome.degree_sequence','...')
 k = np.loadtxt('degree_sequences/out.reactome.degree_sequence')
 k = np.array(k,dtype=int)
 
 kmax = np.max(k)+1
 n = len(k)
+print("fitting...")
 t = solve_t( np.mean(k) ,n )
 rho = solve_rho( np.mean(k), np.mean(k**2), n )
 
