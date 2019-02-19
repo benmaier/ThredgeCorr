@@ -63,7 +63,7 @@ if __name__ == "__main__":
     all_k = 0
     for meas in range(N_meas):
 
-        G = get_networkx_graph(N,0.35,mean_degree=k)
+        G = get_networkx_graph(N,0.5,mean_degree=k)
         all_k += np.mean([ d[1] for d in G.degree() ])
 
     print("<k> =", all_k/N_meas)
