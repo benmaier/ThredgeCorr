@@ -1,145 +1,70 @@
 # ThredgeCorr
 
-Generate instances of George's thresholded edge-correlated network model.
-
-If you want to sample from distributions with larger `N`, check out the C++-based Python package https://github.com/benmaier/cThredgeCorr .
+Generate instances of the thresholded locally-correlated edge weight network model.
 
 ## Install
 
-Clone this repository
+Use pip:
 
-    git clone git@github.com:benmaier/ThredgeCorr.git
-
-Install as development version (such that you don't have to reinstall after updating the repository)
-
-    pip install -e ./ThredgeCorr --no-binary :all:
-
-Alternatively, install as normal
-
-    pip install ./ThredgeCorr
+    pip install ThredgeCorr
 
 ## Examples
-
-First, import `numpy` and the `ThredgeCorrGraph` class.
-
-```python
-import numpy as np
-from ThredgeCorr import ThredgeCorrGraph
-```
 
 ### First steps
 
 Create an instance of the generating class and then an edgelist.
 
 ```python
+from ThredgeCorr import get_networkx_graph
 N_nodes = 100
-beta = 0.49
+rho = 0.49
 mean_degree = 1.2
 
-G = ThredgeCorrGraph(N_nodes, beta, mean_degree)
+G = get_networkx_graph(N_nodes, covariance, mean_degree=mean_degree)
 
 # Alternatively, set this up with a threshold
-G = ThredgeCorrGraph(N_nodes, beta, threshold = 2.253)
-
-# get an edge list from this generating class
-edges = G.get_new_edge_list()
+G = get_networkx_graph(N_nodes, covariance, threshold=0.5)
 ```
 
-### Super fast generation method
-
-Actually generate the networks faster. Everything else stays the same, but you use
+### Use the more advanced class
 
 ```python
-from ThredgeCorr import SuperFastThredgeCorrGraph
+N_nodes = 100
+covariance = 0.35
+mean_degree = 2.0
 
-G = SuperFastThredgeCorrGraph(N_nodes, beta, mean_degree)
-# or
-G = SuperFastThredgeCorrGraph(N_nodes, beta, threshold = 2.253)
-```
-
-If you need it even faster, consider using https://github.com/benmaier/cThredgeCorr.
-
-### Fast generation method
-
-Actually generate the networks faster. Everything else stays the same, but you use
-
-```python
-from ThredgeCorr import FastThredgeCorrGraph
-
-G = FastThredgeCorrGraph(N_nodes, beta, mean_degree)
-# or
-G = FastThredgeCorrGraph(N_nodes, beta, threshold = 2.253)
-```
-
-### Fixing threshold (mean degree, respectively)
-
-Change the threshold directly, or indirectly using the desired mean degree
-
-```python
-G.set_threshold(2.253)
-
-# or
-
-G.set_mean_degree(1.2)
-```
-
-### Covariance update
-
-Update the covariance (takes a while since the Cholesky decomposition has to be run again).
-
-```python
-G.update_covariance(0.2)
-```
-
-### Degrees from network realizations
-
-Compute degree sequences of 500 instances of the current configuration.
-
-```python
-ks = [ G.get_new_adjacency_matrix().sum(axis=1).flatten() for n in range(500) ]
-```
-
-### Degrees from single node sampling
-
-Compute degree sequence comparable to 500 instances of `N = 100` nodes.
-
-```python
-N = 100
-ks = G.estimate_degree_sequence(N*500)
-```
-
-### Transitivity estimation from sampling 3 nodes
-
-Estimate the transitivity by sampling a network of 3 nodes `n` times, then calculating `T = 3 * n_triangles / (3 * n_triangles + n_chains)`.
-
-```python
+from ThredgeCorr import ThredgeCorrConstructor
 from scipy.special import binom
-N = 100
-T = G.estimate_transitivity(int(binom(N,3))*500)
+
+TC = ThredgeCorrConstructor(N_nodes, covariance, mean_degree=mean_degree)
+
+# Generate edgelist
+edgelist = TC.get_edgelist()
+
+# generate sparse csr adjacency matrix
+A_csr = TC.get_adjacency_matrix(sparse=True) # default = False
+
+# generate networkx-Graph
+G = TC.get_graph()
+
+
+# Estimate the transitivity by sampling a network of 3 nodes `N` times,
+# then calculating `T = 3 * n_triangles / (3 * n_triangles + n_chains)`.
+T = TC.estimate_transitivity(int(binom(N_nodes,3))*500)
+
+# Change the threshold directly, or indirectly using the desired mean degree
+
+TC.set_threshold(2.253)
+TC.set_mean_degree(1.2)
+
+TC.update_covariance(0.2)
+
+# Compute degree sequences of 500 instances of the current configuration.
+ks = [ TC.get_adjacency_matrix().sum(axis=1).flatten() for n in range(500) ]
+
+# Compute degree sequence comparable to 500 instances of `N = 100` nodes.
+ks = TC.estimate_degree_sequence(N_nodes*500)
+
+# Compute the mean degree
+TC.get_mean_degree() # mean degree as given by the threshold
 ```
-
-### Class attributes
-You can also check out the values of the current matrices and parameters
-
-```python
-G.t # threshold
-G.b # edge covariance
-G.C # Covariance matrix
-G.L # Cholesky decomposition
-G.X # vector of multivariate Gaussian random variables
-G.mean_degree() # mean degree as given by the threshold
-```
-
-### Edge index ↔ node pair indices
-
-If you want to compute the edge index `e` of a node pair `(i, j)` (with condition `i < j`),
-or the node index pair `(i, j)` from an edge index `e`, do
-
-```python
-e = G.edge_index(i, j)
-i, j = G.node_indices(e)
-```
-
-
-
-
