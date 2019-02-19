@@ -1,6 +1,8 @@
 # ThredgeCorr
 
 Generate instances of the thresholded locally-correlated edge weight network model.
+Find the scripts to generate the figures from the paper in 
+https://github.com/benmaier/ThredgeCorr/tree/master/paper_figures .
 
 
 ## Install
@@ -37,6 +39,12 @@ ThredgeCorr.degree_dist
 ```
 
 and the scripts in https://github.com/benmaier/ThredgeCorr/tree/master/paper_figures .
+
+Links:
+
+https://github.com/benmaier/ThredgeCorr/blob/master/ThredgeCorr/basic_patterns.py
+
+https://github.com/benmaier/ThredgeCorr/blob/master/ThredgeCorr/degree_dist.py
 
 ### Use the more advanced class
 
