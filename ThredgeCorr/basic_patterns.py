@@ -89,7 +89,7 @@ def p0(n,t,rho):
 def mean_degree(n,t):
     return((n-1)*edges(t))
 
-def mean_degree_sq(n,t,rho):
+def mean_degree_sq(n,t,rho,NMAX=40):
     return((n-1)*(n-2)*two_stars(t,rho,NMAX) + (n-1)*edges(t)) 
 
 def F(n,t,rho):

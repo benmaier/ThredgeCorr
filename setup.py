@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='ThredgeCorr',
-      version='0.0.4',
+      version='0.1.0',
       description="Generate instances of the thresholded locally-correlated edge weights network model.",
       url='https://www.github.com/benmaier/ThredgeCorr',
       author='Benjamin F. Maier, George C. Cantwell, Guillaume St-Onge',
@@ -11,7 +11,7 @@ setup(name='ThredgeCorr',
       install_requires=[
           'numpy>=1.14',
           'scipy>=0.17',
-          'mpmath',
+          'mpmath>=1.3',
           'networkx>=2.0',
       ],
       zip_safe=False)

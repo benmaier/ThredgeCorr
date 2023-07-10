@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
 import networkx as nx
+from scipy.stats import expon
 
 from ThredgeCorr.tools import ccdf
 
@@ -49,6 +50,48 @@ def get_networkx_graph(N, covariance, threshold=None,mean_degree=None):
             G.add_edge(i,i+1+j)
 
     return G
+
+from scipy.stats import norm
+
+#def get_cdf_serrano(N, covariance, significance_threshold):
+#
+#    rho = covariance
+#    G, z, y = nx.empty_graph(N), norm(size=N), np.random.normal(size=(N*(N-1))//2)
+#    a, b = np.sqrt(1-2*rho), np.sqrt(rho)
+#
+#    edge_weights = np.zeros_like(y)
+#    node_strengths = np.zeros_like(z)
+#
+#    for i in range(N-1):
+#        edge_weights += np.argwhere((a*np.random.normal(size=(N-1-i)) + b*(z[i]+z[i+1:])
+#            neigh = 
+#            G.add_edge(i,i+1+j)
+#
+#    assert(0<=rho)
+#    assert(rho<=0.5)
+#
+#def get_serrano(N, covariance, significance_threshold):
+#    pass
+#
+#
+#def get_serrano_thresholded_networkx_graph(N, covariance, significance_threshold, scipy_stats_distribution='expon'):
+#
+#    if scipy_stats_distribution == 'expon':
+#        dist = expon()
+#    else:
+#        dist = scipy_stats_distribution
+#
+#    assert(0<=rho)
+#    assert(rho<=0.5)
+#
+#    alpha_tilde = -np.log(significance_threshold)
+#
+#    G, z = nx.empty_graph(N), dist.rvs(size=N)
+#    a, b = np.sqrt(1-2*rho), np.sqrt(rho)
+#
+#    for i in range(N-1):
+#        for j in np.argwhere((a*dist.rvs(size=(N-1-i)) + b*(z[i]+z[i+1:])) > t).T[0]:
+    
 
 if __name__ == "__main__":
 
