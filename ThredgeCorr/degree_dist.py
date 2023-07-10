@@ -75,6 +75,7 @@ def ln_I(k,n,t,rho,X=X,W=W):
 
 def log_binomial(n,k):
     return mp.loggamma(n+1) - mp.loggamma(k+1) - mp.loggamma(n-k+1)
+    #return mp.log(mp.factorial(n)) - mp.log(mp.factorial(k)) - mp.log(mp.factorial(n-k))
 
 def lnpk(n,t,rho,k_max,X=X,W=W):
     return np.array([log_binomial(n-1,k)+ln_I(k,n,t,rho,X,W) for k in range(k_max)])
@@ -121,7 +122,7 @@ if __name__=="__main__":
     rho = 0.4
     logp = log_likelihoods(n, t, rho, k)
 
-    mp.dps = 6
+    mp.dps = 500
 
     import matplotlib.pyplot as pl
 
